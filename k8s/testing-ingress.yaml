@@ -1,0 +1,69 @@
+kind: Pod
+apiVersion: v1
+metadata: 
+  name: giropops
+  labels:
+    app: giropops
+spec:
+  containers:
+    - name: giropops-app
+      image: hashicorp/http-echo:0.2.3
+      args:
+      - "-text=GIROPOPS"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: giropops-service
+spec:
+  selector:
+    app: giropops
+  ports:
+  - port: 5678
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: strigus-app
+  labels:
+    app: strigus
+spec:
+  containers:
+  - name: strigus-app
+    image: hashicorp/http-echo:0.2.3
+    args:
+    - "-text=STRIGUS"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: strigus-service
+spec:
+  selector:
+    app: strigus
+  ports:
+  - port: 5678
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/giropops"
+        backend:
+          service:
+            name: giropops-service
+            port:
+              number: 5678
+      - pathType: Prefix
+        path: "/strigus"
+        backend:
+          service:
+            name: strigus-service
+            port:
+              number: 5678
+---
